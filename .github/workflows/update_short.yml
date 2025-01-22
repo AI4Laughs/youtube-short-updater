@@ -1,5 +1,4 @@
 name: Update YouTube Short Title
-
 on:
   schedule:
     - cron: "*/5 * * * *"  # Runs every 5 minutes
@@ -25,8 +24,17 @@ jobs:
       - name: Create oauth2.json
         run: |
           echo '${{ secrets.OAUTH_JSON }}' > oauth2.json
+          ls -la  # List files to verify creation
+          cat oauth2.json | jq .  # Pretty print JSON to verify structure (excluding sensitive data)
       
+      - name: Check environment
+        run: |
+          echo "Python version:"
+          python --version
+          echo "Pip packages:"
+          pip list
+          
       - name: Run Python script
         env:
           MY_VIDEO_ID: ${{ secrets.MY_VIDEO_ID }}
-        run: python update_short_title.py
+        run: python -u update_short_title.py  # -u for unbuffered output
