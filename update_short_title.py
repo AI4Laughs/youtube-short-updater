@@ -58,11 +58,14 @@ def get_authenticated_service():
 def get_video_details(youtube, video_id):
     """Get video statistics and details."""
     try:
+        print(f"Fetching video details for ID: {video_id}")
         video_request = youtube.videos().list(
             part="statistics,snippet",
             id=video_id
         )
-        return video_request.execute()
+        response = video_request.execute()
+        print(f"Video details response: {json.dumps(response, indent=2)}")
+        return response
     except Exception as e:
         print(f"Error getting video details: {e}")
         return None
@@ -70,13 +73,16 @@ def get_video_details(youtube, video_id):
 def get_latest_comment(youtube, video_id):
     """Get the latest comment from the video."""
     try:
+        print(f"Fetching latest comment for video ID: {video_id}")
         comment_request = youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
             order="time",
             maxResults=1
         )
-        return comment_request.execute()
+        response = comment_request.execute()
+        print(f"Latest comment response: {json.dumps(response, indent=2)}")
+        return response
     except Exception as e:
         print(f"Error getting latest comment: {e}")
         return None
@@ -84,6 +90,11 @@ def get_latest_comment(youtube, video_id):
 def update_video_title(youtube, video_id, new_title, current_snippet):
     """Update the video title."""
     try:
+        print(f"\nAttempting to update video title...")
+        print(f"Video ID being used: {video_id}")
+        print(f"New title: {new_title}")
+        print(f"Current snippet content: {json.dumps(current_snippet, indent=2)}")
+        
         update_request = youtube.videos().update(
             part="snippet",
             body={
@@ -91,9 +102,19 @@ def update_video_title(youtube, video_id, new_title, current_snippet):
                 "snippet": current_snippet
             }
         )
-        return update_request.execute()
+        print("Update request created successfully")
+        
+        response = update_request.execute()
+        print(f"Full update response: {json.dumps(response, indent=2)}")
+        return response
+    except HttpError as e:
+        print(f"HTTP error in update_video_title: {e.resp.status}")
+        print(f"Error content: {e.content}")
+        print(f"Error details: {getattr(e, 'error_details', 'No details available')}")
+        return None
     except Exception as e:
-        print(f"Error updating video title: {e}")
+        print(f"Non-HTTP error in update_video_title: {type(e).__name__}: {str(e)}")
+        print(f"Full error information: {str(e)}")
         return None
 
 def main():
