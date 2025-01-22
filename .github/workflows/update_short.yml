@@ -25,14 +25,15 @@ jobs:
         run: |
           echo '${{ secrets.OAUTH_JSON }}' > oauth2.json
           ls -la  # List files to verify creation
-          cat oauth2.json | jq .  # Pretty print JSON to verify structure (excluding sensitive data)
-      
+          
       - name: Check environment
         run: |
           echo "Python version:"
           python --version
           echo "Pip packages:"
           pip list
+          echo "Directory contents:"
+          ls -la
           
       - name: Run Python script
         env:
